@@ -36,4 +36,3 @@ if uploaded_file:
 
 # Footer with Animation
 st.markdown("<p style='text-align:center; color:gray;'>🚀 Built with ❤️ using Streamlit</p>", unsafe_allow_html=True)
-``
