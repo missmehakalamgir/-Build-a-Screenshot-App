@@ -3,7 +3,7 @@ from PIL import Image, ImageOps
 import io
 
 # Streamlit App Title
-st.title("Simple Photo Editor")
+st.title("Simple Photo Editors")
 
 # Upload Image
 uploaded_image = st.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
