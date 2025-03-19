@@ -1,6 +1,7 @@
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 from PIL import Image
+import numpy as np
 
 # ---- UI Styling ----
 st.set_page_config(page_title="Screenshot Cropper", layout="wide")
@@ -10,15 +11,17 @@ st.markdown("<p style='text-align: center;'>Upload an image, draw a selection, a
 # ---- Upload Screenshot ----
 uploaded_file = st.file_uploader("📤 Upload Screenshot (PNG/JPG)", type=["png", "jpg", "jpeg"])
 
-# ---- Show Uploaded Image Before Cropping ----
+# ---- Show Uploaded Image & Set as Canvas Background ----
+canvas_background = None
 if uploaded_file:
-    st.image(uploaded_file, caption="📷 Uploaded Image", use_container_width=True)
+    img = Image.open(uploaded_file).convert("RGB")
+    canvas_background = np.array(img)  # Convert image to array for Streamlit Canvas
 
 # ---- Drawing Canvas ----
 st.write("🎨 **Draw a selection to crop:**")
 canvas_result = st_canvas(
     fill_color="rgba(255, 255, 255, 0)", stroke_width=3, stroke_color="blue",
-    background_color="white", height=400, width=600, drawing_mode="rect", key="canvas",
+    background_image=canvas_background, height=400, width=600, drawing_mode="rect", key="canvas",
 )
 
 # ---- Crop Button ----
@@ -27,7 +30,6 @@ if st.button("✂️ Crop Screenshot"):
         objects = canvas_result.json_data["objects"]
         if objects:
             rect = objects[0]
-            img = Image.open(uploaded_file).convert("RGB")
             cropped_img = img.crop((int(rect["left"]), int(rect["top"]), int(rect["left"] + rect["width"]), int(rect["top"] + rect["height"])))
             st.image(cropped_img, caption="✨ Cropped Screenshot", use_container_width=True)
         else:
