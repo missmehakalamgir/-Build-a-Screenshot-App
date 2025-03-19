@@ -2,7 +2,6 @@ import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 
-# Streamlit UI
 st.set_page_config(page_title="Screenshot Cropper", layout="wide")
 st.title("📸 Screenshot Cropper")
 
@@ -15,13 +14,14 @@ if uploaded_file:
 
     # Canvas for selection
     st.write("🎨 **Draw a selection to crop:**")
+    
     canvas_result = st_canvas(
         fill_color="rgba(255, 255, 255, 0)", 
         stroke_width=3, 
         stroke_color="red",
-        background_image=img,  # Set image as background
-        height=img.height, 
-        width=img.width, 
+        background_image=img if uploaded_file else None,  # Fix: Show image only if uploaded
+        height=img.height if uploaded_file else 400, 
+        width=img.width if uploaded_file else 600, 
         drawing_mode="rect", 
         key="canvas"
     )
