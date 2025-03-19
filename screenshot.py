@@ -12,16 +12,15 @@ if uploaded_file:
     img = Image.open(uploaded_file)
     st.image(img, caption="Uploaded Image", use_container_width=True)
 
-    # Canvas for selection
+    # Canvas without background_image to avoid error
     st.write("🎨 **Draw a selection to crop:**")
-    
     canvas_result = st_canvas(
         fill_color="rgba(255, 255, 255, 0)", 
         stroke_width=3, 
         stroke_color="red",
-        background_image=img if uploaded_file else None,  # Fix: Show image only if uploaded
-        height=img.height if uploaded_file else 400, 
-        width=img.width if uploaded_file else 600, 
+        background_color="white",  # Fix: Removed background_image to prevent error
+        height=400, 
+        width=600, 
         drawing_mode="rect", 
         key="canvas"
     )
@@ -32,12 +31,13 @@ if uploaded_file:
             objects = canvas_result.json_data["objects"]
             if objects:
                 rect = objects[0]
-                cropped_img = img.crop((
-                    int(rect["left"]), 
-                    int(rect["top"]), 
-                    int(rect["left"] + rect["width"]), 
-                    int(rect["top"] + rect["height"])
-                ))
+                left = int(rect["left"])
+                top = int(rect["top"])
+                width = int(rect["width"])
+                height = int(rect["height"])
+
+                # Crop the uploaded image
+                cropped_img = img.crop((left, top, left + width, top + height))
                 st.image(cropped_img, caption="✨ Cropped Screenshot", use_container_width=True)
             else:
                 st.warning("⚠️ Please draw a selection before cropping.")
