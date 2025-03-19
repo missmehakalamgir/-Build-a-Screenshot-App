@@ -1,10 +1,11 @@
 import streamlit as st
-import cv2
-import numpy as np
+from streamlit_drawable_canvas import st_canvas
 from PIL import Image
+import numpy as np
+import io
 
 # 🏷️ Title
-st.title("📸 Screenshot Cropper App")
+st.title("🖱️ Screenshot Cropper - Select Area with Mouse!")
 
 # 📤 Upload Image
 uploaded_file = st.file_uploader("Upload an Image", type=["jpg", "png", "jpeg"])
@@ -14,21 +15,33 @@ if uploaded_file:
     image = Image.open(uploaded_file)
     img_array = np.array(image)
 
-    # 🎯 Image Dimensions
-    h, w, _ = img_array.shape
+    # 🖼️ Display Image with Canvas
+    st.write("🎨 **Draw a selection to crop:**")
+    canvas_result = st_canvas(
+        fill_color="rgba(255, 165, 0, 0.3)",  # Transparent Orange
+        stroke_width=3,
+        stroke_color="red",
+        background_image=image,
+        update_streamlit=True,
+        height=image.height,
+        width=image.width,
+        drawing_mode="rect",
+        key="canvas"
+    )
 
-    # 🖱️ Select Crop Area (X, Y, Width, Height)
-    x1 = st.slider("Select X1 (Left)", 0, w, 0)
-    y1 = st.slider("Select Y1 (Top)", 0, h, 0)
-    x2 = st.slider("Select X2 (Right)", x1 + 10, w, w)
-    y2 = st.slider("Select Y2 (Bottom)", y1 + 10, h, h)
+    # 🎯 Crop Selection
+    if canvas_result.json_data:
+        objects = canvas_result.json_data["objects"]
+        if len(objects) > 0:
+            # Get last drawn rectangle
+            obj = objects[-1]
+            x, y, w, h = int(obj["left"]), int(obj["top"]), int(obj["width"]), int(obj["height"])
 
-    # 🖼️ Show Selection
-    st.image(image.crop((x1, y1, x2, y2)), caption="Cropped Image")
+            # Crop Image
+            cropped = image.crop((x, y, x + w, y + h))
+            st.image(cropped, caption="🖼️ Cropped Image", use_column_width=True)
 
-    # 📥 Download Cropped Image
-    cropped = image.crop((x1, y1, x2, y2))
-    st.download_button("📥 Download Cropped Image",
-                       data=cropped.tobytes(),
-                       file_name="cropped_image.png",
-                       mime="image/png")
+            # 📥 Download Cropped Image
+            buf = io.BytesIO()
+            cropped.save(buf, format="PNG")
+            st.download_button("📥 Download Cropped Image", buf.getvalue(), "cropped_image.png", "image/png")
