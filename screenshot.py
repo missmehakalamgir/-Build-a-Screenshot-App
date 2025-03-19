@@ -29,7 +29,7 @@ if uploaded_image is not None:
 
         img_alpha = img.split()[-1]  
         combined_image = Image.new("RGBA", img.size)
-        combined_image.paste(new_bg, (0, 0))  
+        combined_image.paste(new_bg, (0, 0)) 
         combined_image.paste(img, (0, 0), img_alpha)  
 
         st.image(combined_image, caption="Image with New Background", use_column_width=True)
