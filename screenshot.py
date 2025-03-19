@@ -21,7 +21,7 @@ if uploaded_file:
         fill_color="rgba(255, 165, 0, 0.3)",  # Transparent Orange
         stroke_width=3,
         stroke_color="red",
-        background_image=img_array,  # 🛠️ FIXED: Image as NumPy Array
+        background_image=Image.fromarray(img_array),  # 🛠️ FIXED: PIL Image Format
         update_streamlit=True,
         height=img_array.shape[0],
         width=img_array.shape[1],
