@@ -15,14 +15,17 @@ if uploaded_file:
     # Show Original Image
     st.image(img, caption="🖼 Original Image", use_container_width=True)
 
-    # Canvas for selection (Image inside canvas now)
+    # Fix: Convert image to NumPy for background
+    bg_image = img.convert("RGB")
+
+    # Canvas for selection
     canvas_result = st_canvas(
         fill_color="rgba(0, 0, 0, 0)",  
         stroke_width=2,
         stroke_color="red",
-        background_image=img,  # 🔥 FIXED: Image now shows inside selection box
-        height=img_array.shape[0],
-        width=img_array.shape[1],
+        background_image=bg_image,  # ✅ Fixed background image issue
+        height=img.height,
+        width=img.width,
         drawing_mode="rect",
         key="canvas"
     )
