@@ -1,3 +1,5 @@
 streamlit
 pyautogui
 pillow
+mss
+xvfbwrapper  # For headless display support
