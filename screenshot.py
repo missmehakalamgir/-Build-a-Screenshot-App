@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 
-st.title("📸 Screenshot Cropper (Drag to Select)")
+st.title("📸 Screenshot Cropper (Drag & Select)")
 
 # Upload Image
 uploaded_file = st.file_uploader("Upload an image:", type=["png", "jpg", "jpeg"])
@@ -15,14 +15,14 @@ if uploaded_file:
     # Show Original Image
     st.image(img, caption="🖼 Original Image", use_container_width=True)
 
-    # Canvas for selection
+    # Canvas for selection (NO background image issue now)
     canvas_result = st_canvas(
         fill_color="rgba(0, 0, 0, 0)",  
         stroke_width=2,
         stroke_color="red",
-        background_image=img,  
-        height=img.height,
-        width=img.width,
+        background_color=None,  # FIX: Removed image issue
+        height=img_array.shape[0],
+        width=img_array.shape[1],
         drawing_mode="rect",
         key="canvas"
     )
@@ -33,7 +33,10 @@ if uploaded_file:
             objects = canvas_result.json_data["objects"]
             if objects:
                 rect = objects[0]  # First rectangle
-                x, y, w, h = int(rect["left"]), int(rect["top"]), int(rect["width"]), int(rect["height"])
+                x, y, w, h = map(int, [rect["left"], rect["top"], rect["width"], rect["height"]])
+
+                # Fix: Ensure coordinates are within image bounds
+                x, y, w, h = max(0, x), max(0, y), min(img.width, w), min(img.height, h)
 
                 # Crop
                 cropped = img.crop((x, y, x + w, y + h))
