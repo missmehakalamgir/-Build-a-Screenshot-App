@@ -1,45 +1,42 @@
 import streamlit as st
-from streamlit_drawable_canvas import st_canvas
-from PIL import Image
 import numpy as np
+from PIL import Image
+import cv2
+from streamlit_drawable_canvas import st_canvas
 
-st.title("📸 Screenshot Cropper")
+st.title("📸 Screenshot Cropper App")
 
 # Upload image
-uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+uploaded_file = st.file_uploader("Upload an Image", type=["jpg", "png", "jpeg"])
 
 if uploaded_file:
-    # Open image
-    img = Image.open(uploaded_file)
-    img = img.convert("RGB")  # Convert to RGB (fix some issues with transparency)
-    img_array = np.array(img)
+    image = Image.open(uploaded_file)
+    img_array = np.array(image)
 
-    st.image(img, caption="Original Image", use_column_width=True)
-
-    # Canvas settings
-    st.write("🎨 Draw a selection to crop:")
+    # Show image with selection canvas
+    st.write("🎨 **Draw a selection to crop:**")
     canvas_result = st_canvas(
-        fill_color="rgba(255, 165, 0, 0.3)",  # Transparent orange
-        stroke_width=2,
+        fill_color="rgba(255, 165, 0, 0.3)",  # Transparent selection box
+        stroke_width=3,
         stroke_color="red",
-        background_image=img,  # Pass the PIL image
+        background_image=image,
         update_streamlit=True,
-        height=img.height // 2,  # Adjust to show part of the image
-        width=img.width // 2,
-        drawing_mode="rect",  # Rectangular selection
+        height=image.height,
+        width=image.width,
+        drawing_mode="rect",
         key="canvas",
     )
 
+    # Crop the selected area
     if canvas_result.json_data is not None:
         objects = canvas_result.json_data["objects"]
-        if objects:
-            # Get selection coordinates
-            obj = objects[0]  # First drawn object
-            left = int(obj["left"])
-            top = int(obj["top"])
-            width = int(obj["width"])
-            height = int(obj["height"])
+        if len(objects) > 0:
+            obj = objects[0]
+            x1, y1, width, height = map(int, [obj["left"], obj["top"], obj["width"], obj["height"]])
+            cropped_img = img_array[y1:y1+height, x1:x1+width]
+            cropped_pil = Image.fromarray(cropped_img)
 
-            # Crop and show the image
-            cropped_img = img.crop((left, top, left + width, top + height))
-            st.image(cropped_img, caption="Cropped Image", use_column_width=True)
+            st.image(cropped_pil, caption="🖼 Cropped Image", use_column_width=True)
+        else:
+            st.warning("⚠️ Please draw a selection to crop.")
+
