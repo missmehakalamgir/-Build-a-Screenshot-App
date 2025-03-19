@@ -15,16 +15,16 @@ if uploaded_file:
     image = Image.open(uploaded_file)
     img_array = np.array(image)
 
-    # 🖼️ Display Image with Canvas
+    # 🎨 Show Image in Canvas
     st.write("🎨 **Draw a selection to crop:**")
     canvas_result = st_canvas(
         fill_color="rgba(255, 165, 0, 0.3)",  # Transparent Orange
         stroke_width=3,
         stroke_color="red",
-        background_image=Image.fromarray(img_array),  # 🛠️ FIXED: PIL Image Format
+        background_image=image,  # 🛠️ FIXED: No Conversion Needed
         update_streamlit=True,
-        height=img_array.shape[0],
-        width=img_array.shape[1],
+        height=image.height,
+        width=image.width,
         drawing_mode="rect",
         key="canvas"
     )
