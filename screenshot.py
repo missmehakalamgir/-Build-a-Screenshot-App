@@ -1,47 +1,44 @@
 import streamlit as st
-from streamlit_drawable_canvas import st_canvas
-from PIL import Image
+import cv2
 import numpy as np
-import io
+from PIL import Image
+from streamlit_drawable_canvas import st_canvas
 
-# 🏷️ Title
-st.title("🖱️ Screenshot Cropper - Select Area with Mouse!")
+st.title("🖼 Screenshot Cropper with Mouse Selection")
 
-# 📤 Upload Image
-uploaded_file = st.file_uploader("Upload an Image", type=["jpg", "png", "jpeg"])
-
+# Upload image
+uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
 if uploaded_file:
-    # Open Image
     image = Image.open(uploaded_file)
-    img_array = np.array(image)
-
-    # 🎨 Show Image in Canvas
-    st.write("🎨 **Draw a selection to crop:**")
+    image = np.array(image)
+    st.image(image, caption="Original Image", use_column_width=True)
+    
+    # Create a canvas for cropping
+    st.write("### Draw a selection to crop:")
     canvas_result = st_canvas(
-        fill_color="rgba(255, 165, 0, 0.3)",  # Transparent Orange
-        stroke_width=3,
-        stroke_color="red",
-        background_image=image,  # 🛠️ FIXED: No Conversion Needed
+        fill_color="rgba(255, 165, 0, 0.3)",  # Transparent fill
+        stroke_width=2,
+        stroke_color="#FF0000",
+        background_image=Image.fromarray(image),
         update_streamlit=True,
-        height=image.height,
-        width=image.width,
-        drawing_mode="rect",
+        width=image.shape[1],
+        height=image.shape[0],
+        drawing_mode="rect",  # Rectangle selection mode
         key="canvas"
     )
-
-    # 🎯 Crop Selection
-    if canvas_result.json_data:
+    
+    # Crop the selected area
+    if canvas_result.json_data is not None:
         objects = canvas_result.json_data["objects"]
-        if len(objects) > 0:
-            # Get last drawn rectangle
-            obj = objects[-1]
-            x, y, w, h = int(obj["left"]), int(obj["top"]), int(obj["width"]), int(obj["height"])
-
-            # Crop Image
-            cropped = image.crop((x, y, x + w, y + h))
-            st.image(cropped, caption="🖼️ Cropped Image", use_column_width=True)
-
-            # 📥 Download Cropped Image
-            buf = io.BytesIO()
-            cropped.save(buf, format="PNG")
-            st.download_button("📥 Download Cropped Image", buf.getvalue(), "cropped_image.png", "image/png")
+        if objects:
+            obj = objects[0]  # Only consider the first drawn rectangle
+            left = int(obj["left"])
+            top = int(obj["top"])
+            width = int(obj["width"])
+            height = int(obj["height"])
+            
+            cropped_image = image[top:top+height, left:left+width]
+            if cropped_image.size > 0:
+                st.image(cropped_image, caption="Cropped Image", use_column_width=True)
+            else:
+                st.warning("Invalid crop selection. Please select a valid area.")
