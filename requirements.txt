@@ -1,6 +1,2 @@
 streamlit
 Pillow
-rembg
-onnxruntime
-numpy
-scikit-image
