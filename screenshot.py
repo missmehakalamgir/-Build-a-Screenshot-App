@@ -17,17 +17,18 @@ if uploaded_file:
 
     # Create a drawable canvas
     st.subheader("✏️ Draw a selection to crop")
-    canvas_result = st_canvas(
-        fill_color="rgba(255, 165, 0, 0.3)",  # Transparent fill
-        stroke_width=3,
-        stroke_color="red",
-        background_image=image,
-        update_streamlit=True,
-        width=image.width,
-        height=image.height,
-        drawing_mode="rect",  # Only rectangle selection
-        key="canvas",
-    )
+canvas_result = st_canvas(
+    fill_color="rgba(255, 165, 0, 0.3)",  
+    stroke_width=3,
+    stroke_color="red",
+    background_image=img_array,  # FIX: Directly pass numpy array
+    update_streamlit=True,
+    width=image.width,
+    height=image.height,
+    drawing_mode="rect",
+    key="canvas",
+)
+
 
     # Process crop
     if canvas_result.json_data is not None:
