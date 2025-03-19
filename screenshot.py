@@ -2,26 +2,25 @@ import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 
-# ---- UI Styling ----
+# Streamlit UI
 st.set_page_config(page_title="Screenshot Cropper", layout="wide")
-st.markdown("<h1 style='text-align: center; color: #FF4B4B;'>📸 Screenshot Cropper</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center;'>Upload an image, draw a selection, and crop easily!</p>", unsafe_allow_html=True)
+st.title("📸 Screenshot Cropper")
 
-# ---- Upload Screenshot ----
+# Upload image
 uploaded_file = st.file_uploader("📤 Upload Screenshot (PNG/JPG)", type=["png", "jpg", "jpeg"])
 img = None
 
 if uploaded_file:
-    img = Image.open(uploaded_file).convert("RGB")  # Open image as PIL object
+    img = Image.open(uploaded_file).convert("RGB")  # Convert to PIL Image
 
-# ---- Drawing Canvas ----
+# Drawing canvas
 st.write("🎨 **Draw a selection to crop:**")
 canvas_result = st_canvas(
     fill_color="rgba(255, 255, 255, 0)", stroke_width=3, stroke_color="blue",
     background_image=img if img else None, height=400, width=600, drawing_mode="rect", key="canvas",
 )
 
-# ---- Crop Button ----
+# Crop Button
 if st.button("✂️ Crop Screenshot"):
     if uploaded_file and canvas_result.json_data:
         objects = canvas_result.json_data["objects"]
@@ -34,5 +33,5 @@ if st.button("✂️ Crop Screenshot"):
     else:
         st.warning("⚠️ Upload an image first.")
 
-# ---- Footer ----
-st.markdown("<p style='text-align: center; font-size: 14px;'>🚀 Built with ❤️ using Streamlit</p>", unsafe_allow_html=True)
+# Footer
+st.markdown("<p style='text-align: center;'>🚀 Built with ❤️ using Streamlit</p>", unsafe_allow_html=True)
