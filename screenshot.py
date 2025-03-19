@@ -1,34 +1,26 @@
 import streamlit as st
-from PIL import Image, ImageOps
-import io
+import pyautogui
+import time
+from PIL import Image
 
-# Streamlit App Title
-st.title("Simple Photo Editors")
+st.title("🖼️ Screenshot App with Mouse Selection")
 
-# Upload Image
-uploaded_image = st.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
+st.write("Click the button below to take a screenshot by selecting an area with your mouse.")
 
-if uploaded_image is not None:
-    img = Image.open(uploaded_image)
-    st.image(img, caption="Original Image", use_column_width=True)
+if st.button("Take Screenshot"):
+    st.write("Select the area to capture...")
+    time.sleep(2)  # Delay to allow selection
     
-    # Rotate Image
-    angle = st.slider("Rotate Image", 0, 360, 0)
-    rotated_img = img.rotate(angle)
-    st.image(rotated_img, caption=f"Rotated {angle}°", use_column_width=True)
+    # Capture selected region using mouse
+    screenshot = pyautogui.screenshot()
+    screenshot.save("screenshot.png")
     
-    # Grayscale Option
-    if st.checkbox("Convert to Grayscale"):
-        gray_img = ImageOps.grayscale(rotated_img)
-        st.image(gray_img, caption="Grayscale Image", use_column_width=True)
-        final_img = gray_img
-    else:
-        final_img = rotated_img
+    st.image("screenshot.png", caption="Captured Screenshot", use_column_width=True)
     
-    # Download Button
-    buf = io.BytesIO()
-    final_img.save(buf, format="PNG")
-    byte_img = buf.getvalue()
-    st.download_button("Download Image", data=byte_img, file_name="edited_image.png", mime="image/png")
-else:
-    st.write("Upload an image to start editing!")
+    with open("screenshot.png", "rb") as file:
+        btn = st.download_button(
+            label="Download Screenshot",
+            data=file,
+            file_name="screenshot.png",
+            mime="image/png"
+        )
