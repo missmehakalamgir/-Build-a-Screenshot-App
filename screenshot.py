@@ -1,7 +1,6 @@
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 from PIL import Image
-import numpy as np
 
 # ---- UI Styling ----
 st.set_page_config(page_title="Screenshot Cropper", layout="wide")
@@ -11,11 +10,11 @@ st.markdown("<p style='text-align: center;'>Upload an image, draw a selection, a
 # ---- Upload Screenshot ----
 uploaded_file = st.file_uploader("📤 Upload Screenshot (PNG/JPG)", type=["png", "jpg", "jpeg"])
 
-# ---- Show Uploaded Image & Set as Canvas Background ----
+# ---- Show Uploaded Image ----
 canvas_background = None
 if uploaded_file:
-    img = Image.open(uploaded_file).convert("RGB")
-    canvas_background = np.array(img)  # Convert image to array for Streamlit Canvas
+    img = Image.open(uploaded_file).convert("RGB")  # Open and Convert to RGB
+    canvas_background = img  # Pass as PIL Image (Not NumPy Array)
 
 # ---- Drawing Canvas ----
 st.write("🎨 **Draw a selection to crop:**")
