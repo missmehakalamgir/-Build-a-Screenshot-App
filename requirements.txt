@@ -1,4 +1,1 @@
 streamlit
-st_canvas
-yautogui
-PIL
