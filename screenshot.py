@@ -10,6 +10,10 @@ st.markdown("<p style='text-align: center;'>Upload an image, draw a selection, a
 # ---- Upload Screenshot ----
 uploaded_file = st.file_uploader("📤 Upload Screenshot (PNG/JPG)", type=["png", "jpg", "jpeg"])
 
+# ---- Show Uploaded Image Before Cropping ----
+if uploaded_file:
+    st.image(uploaded_file, caption="📷 Uploaded Image", use_container_width=True)
+
 # ---- Drawing Canvas ----
 st.write("🎨 **Draw a selection to crop:**")
 canvas_result = st_canvas(
@@ -25,7 +29,7 @@ if st.button("✂️ Crop Screenshot"):
             rect = objects[0]
             img = Image.open(uploaded_file).convert("RGB")
             cropped_img = img.crop((int(rect["left"]), int(rect["top"]), int(rect["left"] + rect["width"]), int(rect["top"] + rect["height"])))
-            st.image(cropped_img, caption="✨ Cropped Screenshot", use_column_width=True)
+            st.image(cropped_img, caption="✨ Cropped Screenshot", use_container_width=True)
         else:
             st.warning("⚠️ Please draw a selection before cropping.")
     else:
