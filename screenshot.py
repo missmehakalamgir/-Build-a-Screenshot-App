@@ -21,10 +21,10 @@ if uploaded_file:
         fill_color="rgba(255, 165, 0, 0.3)",  # Transparent Orange
         stroke_width=3,
         stroke_color="red",
-        background_image=image,
+        background_image=img_array,  # 🛠️ FIXED: Image as NumPy Array
         update_streamlit=True,
-        height=image.height,
-        width=image.width,
+        height=img_array.shape[0],
+        width=img_array.shape[1],
         drawing_mode="rect",
         key="canvas"
     )
