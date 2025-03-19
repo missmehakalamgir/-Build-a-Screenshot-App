@@ -1,27 +1,31 @@
 import streamlit as st
-from PIL import Image
-import numpy as np
 import cv2
+import numpy as np
+from PIL import Image
 
-# 🔹 Page Title
-st.set_page_config(page_title="Screenshot Cropper", layout="centered")
-st.markdown("<h1 style='text-align:center;'>✂️ Screenshot Cropper</h1>", unsafe_allow_html=True)
+st.title("📸 Screenshot Cropper")
 
-# 📤 Image Upload
-uploaded_file = st.file_uploader("Upload an Image", type=["png", "jpg", "jpeg"])
+# Upload Image
+uploaded_file = st.file_uploader("Upload an image:", type=["png", "jpg", "jpeg"])
 
 if uploaded_file:
     img = Image.open(uploaded_file)
-    st.image(img, caption="📷 Uploaded Image", use_column_width=True)
+    img_array = np.array(img)
 
-    # 🎯 Get Crop Coordinates
-    x1, x2 = st.slider("🔽 Select Width", 0, img.width, (0, img.width))
-    y1, y2 = st.slider("🔄 Select Height", 0, img.height, (0, img.height))
+    # Show Original Image
+    st.image(img, caption="Original Image", use_container_width=True)
 
-    # ✂️ Crop Image
-    if st.button("Crop Screenshot"):
-        cropped_img = np.array(img)[y1:y2, x1:x2]
-        st.image(Image.fromarray(cropped_img), caption="✨ Cropped Image", use_column_width=True)
+    # Selection Box
+    x1 = st.slider("X1", 0, img.width, 10)
+    y1 = st.slider("Y1", 0, img.height, 10)
+    x2 = st.slider("X2", x1 + 10, img.width, img.width)
+    y2 = st.slider("Y2", y1 + 10, img.height, img.height)
 
-# Footer
-st.markdown("<p style='text-align:center; color:gray;'>🚀 Built with ❤️ using Streamlit</p>", unsafe_allow_html=True)
+    # Crop Image
+    if st.button("✂ Crop Image"):
+        cropped = img_array[y1:y2, x1:x2]
+        cropped_pil = Image.fromarray(cropped)
+        st.image(cropped_pil, caption="Cropped Image", use_container_width=True)
+
+        # Download Option
+        st.download_button("📥 Download Cropped Image", cropped_pil.tobytes(), file_name="cropped.png")
