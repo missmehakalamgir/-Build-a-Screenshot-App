@@ -1,9 +1,9 @@
 import streamlit as st
-import cv2
 import numpy as np
 from PIL import Image
+from streamlit_drawable_canvas import st_canvas
 
-st.title("📸 Screenshot Cropper")
+st.title("📸 Screenshot Cropper (Drag to Select)")
 
 # Upload Image
 uploaded_file = st.file_uploader("Upload an image:", type=["png", "jpg", "jpeg"])
@@ -13,19 +13,35 @@ if uploaded_file:
     img_array = np.array(img)
 
     # Show Original Image
-    st.image(img, caption="Original Image", use_container_width=True)
+    st.image(img, caption="🖼 Original Image", use_container_width=True)
 
-    # Selection Box
-    x1 = st.slider("X1", 0, img.width, 10)
-    y1 = st.slider("Y1", 0, img.height, 10)
-    x2 = st.slider("X2", x1 + 10, img.width, img.width)
-    y2 = st.slider("Y2", y1 + 10, img.height, img.height)
+    # Canvas for selection
+    canvas_result = st_canvas(
+        fill_color="rgba(0, 0, 0, 0)",  
+        stroke_width=2,
+        stroke_color="red",
+        background_image=img,  
+        height=img.height,
+        width=img.width,
+        drawing_mode="rect",
+        key="canvas"
+    )
 
-    # Crop Image
+    # Crop Image when a rectangle is drawn
     if st.button("✂ Crop Image"):
-        cropped = img_array[y1:y2, x1:x2]
-        cropped_pil = Image.fromarray(cropped)
-        st.image(cropped_pil, caption="Cropped Image", use_container_width=True)
+        if canvas_result.json_data is not None:
+            objects = canvas_result.json_data["objects"]
+            if objects:
+                rect = objects[0]  # First rectangle
+                x, y, w, h = int(rect["left"]), int(rect["top"]), int(rect["width"]), int(rect["height"])
 
-        # Download Option
-        st.download_button("📥 Download Cropped Image", cropped_pil.tobytes(), file_name="cropped.png")
+                # Crop
+                cropped = img.crop((x, y, x + w, y + h))
+
+                # Show cropped image
+                st.image(cropped, caption="✅ Cropped Image", use_container_width=True)
+
+                # Download button
+                st.download_button("📥 Download Cropped Image", cropped.tobytes(), file_name="cropped.png")
+            else:
+                st.warning("⚠ Please draw a rectangle to select an area.")
