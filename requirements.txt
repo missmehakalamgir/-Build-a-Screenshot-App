@@ -1,4 +1,5 @@
 streamlit
-streamlit-drawable-canvas
+streamlit-cropper
+opencv-python
+numpy
 pillow
-numpycv2
