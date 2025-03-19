@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 
-st.title("📸 Screenshot Cropper (Drag & Select)")
+st.title("📸 Screenshot Cropper (Live Preview)")
 
 # Upload Image
 uploaded_file = st.file_uploader("Upload an image:", type=["png", "jpg", "jpeg"])
@@ -15,12 +15,12 @@ if uploaded_file:
     # Show Original Image
     st.image(img, caption="🖼 Original Image", use_container_width=True)
 
-    # Canvas for selection (NO background image issue now)
+    # Canvas for selection (Image inside canvas now)
     canvas_result = st_canvas(
         fill_color="rgba(0, 0, 0, 0)",  
         stroke_width=2,
         stroke_color="red",
-        background_color=None,  # FIX: Removed image issue
+        background_image=img,  # 🔥 FIXED: Image now shows inside selection box
         height=img_array.shape[0],
         width=img_array.shape[1],
         drawing_mode="rect",
